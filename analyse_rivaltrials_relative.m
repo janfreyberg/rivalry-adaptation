@@ -157,8 +157,8 @@ for iGroup = 1:2
         median_percept{iGroup, 1, 1, 2}(iSubject, 1) = median(mix_durs);
         median_percept{iGroup, 1, 1, 3}(iSubject, 1) = median(red_durs);
         
-        valtime_toExposed = [valtime_toExposed, first_red(first_red == first_dominant)-nanmedian(noexp_timeRed)]; 
-        valtime_toNExposed = [valtime_toNExposed, first_green(first_green == first_dominant)-nanmedian(noexp_timeGreen)];
+        valtime_toExposed = [valtime_toExposed, first_red(first_red == first_dominant)-nanmean(noexp_timeRed)]; 
+        valtime_toNExposed = [valtime_toNExposed, first_green(first_green == first_dominant)-nanmean(noexp_timeGreen)];
         
         percept_sum{iGroup, 1, 1, 1}(iSubject) = sum(total_green) / (numel(valid_red_trials)*6);
         percept_sum{iGroup, 1, 1, 2}(iSubject) = sum(total_mix) / (numel(valid_red_trials)*6);
@@ -206,8 +206,8 @@ for iGroup = 1:2
         median_percept{iGroup, 1, 2, 2}(iSubject, 1) = median(mix_durs);
         median_percept{iGroup, 1, 2, 3}(iSubject, 1) = median(red_durs);
         
-        valtime_toExposed = [valtime_toExposed, first_green(first_green == first_dominant)-nanmedian(noexp_timeGreen)];
-        valtime_toNExposed = [valtime_toNExposed, first_red(first_red == first_dominant)-nanmedian(noexp_timeRed)];
+        valtime_toExposed = [valtime_toExposed, first_green(first_green == first_dominant)-nanmean(noexp_timeGreen)];
+        valtime_toNExposed = [valtime_toNExposed, first_red(first_red == first_dominant)-nanmean(noexp_timeRed)];
         
         valExpDom{iGroup}(iSubject, 1) = median([prevExposed; green_durs]);
         valNoExpDom{iGroup}(iSubject, 1) = median([prevNonExposed; red_durs]);
@@ -258,8 +258,8 @@ for iGroup = 1:2
         median_percept{iGroup, 2, 1, 2}(iSubject, 1) = median(mix_durs);
         median_percept{iGroup, 2, 1, 3}(iSubject, 1) = median(red_durs);
         
-        invtime_toExposed = [invtime_toExposed, first_red(first_red == first_dominant)-nanmedian(noexp_timeRed)];
-        invtime_toNExposed = [invtime_toNExposed, first_green(first_green == first_dominant)-nanmedian(noexp_timeGreen)];
+        invtime_toExposed = [invtime_toExposed, first_red(first_red == first_dominant)-nanmean(noexp_timeRed)];
+        invtime_toNExposed = [invtime_toNExposed, first_green(first_green == first_dominant)-nanmean(noexp_timeGreen)];
 
         percept_sum{iGroup, 2, 1, 1}(iSubject) = sum(total_green) / (numel(oppo_red_trials)*6);
         percept_sum{iGroup, 2, 1, 2}(iSubject) = sum(total_mix) / (numel(oppo_red_trials)*6);
@@ -307,8 +307,8 @@ for iGroup = 1:2
         median_percept{iGroup, 2, 2, 2}(iSubject, 1) = median(mix_durs);
         median_percept{iGroup, 2, 2, 3}(iSubject, 1) = median(red_durs);
         
-        invtime_toExposed = [invtime_toExposed, first_green(first_green == first_dominant)-nanmedian(noexp_timeGreen)];
-        invtime_toNExposed = [invtime_toNExposed, first_red(first_red == first_dominant)-nanmedian(noexp_timeRed)];
+        invtime_toExposed = [invtime_toExposed, first_green(first_green == first_dominant)-nanmean(noexp_timeGreen)];
+        invtime_toNExposed = [invtime_toNExposed, first_red(first_red == first_dominant)-nanmean(noexp_timeRed)];
         
         invExpDom{iGroup}(iSubject, 1) = median([prevExposed; green_durs]);
         invNoExpDom{iGroup}(iSubject, 1) = median([prevNonExposed; red_durs]);
@@ -320,11 +320,11 @@ for iGroup = 1:2
         
         %==================================================================
         
-        val_toExposed{iGroup}(iSubject, 1) = nanmedian(valtime_toExposed);
-        val_toNExposed{iGroup}(iSubject, 1) = nanmedian(valtime_toNExposed);
-        inv_toExposed{iGroup}(iSubject, 1) = nanmedian(invtime_toExposed);
-        inv_toNExposed{iGroup}(iSubject, 1) = nanmedian(invtime_toNExposed);
-        non_toDominant{iGroup}(iSubject, 1) = nanmedian(notime_toDominant);
+        val_toExposed{iGroup}(iSubject, 1) = nanmean(valtime_toExposed);
+        val_toNExposed{iGroup}(iSubject, 1) = nanmean(valtime_toNExposed);
+        inv_toExposed{iGroup}(iSubject, 1) = nanmean(invtime_toExposed);
+        inv_toNExposed{iGroup}(iSubject, 1) = nanmean(invtime_toNExposed);
+        non_toDominant{iGroup}(iSubject, 1) = nanmean(notime_toDominant);
         
     end
 end
