@@ -1,10 +1,11 @@
 function rivalrytrials
 try
+clear all
 %% Session Variables
-
+commandwindow;
 ID = input('Participant ID? ', 's');
-scr_diagonal = input('Screen Diagonal? ');
-scr_distance = 57;
+scr_diagonal = 24;%input('Screen Diagonal? ');
+scr_distance = 60;
 diagnosis = input('Diagnosis? ');
 
 tstamp = clock;
@@ -43,7 +44,6 @@ l_key = KbName('LeftArrow'); r_key = KbName('RightArrow');
 u_key = KbName('UpArrow'); d_key = KbName('DownArrow');
 esc_key = KbName('Escape');
 ent_key = KbName('Return'); ent_key = ent_key(1);
-ListenChar(2);
 
 % Sound
 InitializePsychSound;
@@ -58,6 +58,9 @@ if IsLinux
     Screen('TextFont', scr, '-schumacher-clean-medium-r-normal--0-0-75-75-c-0-koi8-r');
 end
 Screen('BlendFunction', scr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+% Save scripts for posterity
+scripts = savescripts;
 
 % Priority
 Priority(1);
@@ -79,16 +82,12 @@ fixColour = 255;
 
 %% Find the spot
 
-% this fct only presents two lines. try and make them match up with mirrors
-calibrate_mirrors;
-
 [offset, frameRect, stimRect, fixLines] = find_offset;
-WaitSecs(1);
 Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
 Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
 Screen('Flip', scr);
 WaitSecs(0.5);
-KbWait;
+KbStrokeWait;
 
 
 
@@ -230,8 +229,6 @@ data.pressAv = permute(data.pressAv, [2, 3, 1]);
 catch err
 %% Catch
     sca;
-%     KbQueueFlush;
-%     KbQueueStop;
     savefile = [savefile(1:(size(savefile, 2)-4)), '-ERROR.mat'];
     save(savefile);
     ListenChar(0);
@@ -273,11 +270,7 @@ end
             Screen('FrameRect', scr, [255,0;255,0;255,0], frameRect, frameWidth);
             Screen('DrawLines', scr, fixLines, fixWidth, [255,255,255,255,0,0,0,0;255,255,255,255,0,0,0,0;255,255,255,255,0,0,0,0]);
             Screen('Flip', scr);
-            
-            WaitSecs(0.2);
-            
-            [~, keyCode] = KbWait;
-            
+            [~, keyCode] = KbStrokeWait;
             if keyCode(u_key)
                 offset = offset + 10;
             elseif keyCode(d_key)
@@ -290,7 +283,7 @@ end
                 offset = offset + stimsize/2 + frameWidth;
                 break;
             elseif keyCode(esc_key)
-                error('You interrupted the script!');
+                error('You interrupted the script');
             end
             if offset < stimsize
                 offset = stimsize;
@@ -329,11 +322,8 @@ end
             
             Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
             Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
-            Screen('Flip', scr);
-            
-            WaitSecs(0.2);
-            
-            [~, keyCode] = KbWait;
+            Screen('Flip', scr);            
+            [~, keyCode] = KbStrokeWait;
             
             if keyCode(u_key)
                 offset = offset + 10;
@@ -353,16 +343,6 @@ end
     end
 
 
-    function calibrate_mirrors
-        % present two lines, one blue, one red (prevent fusing!), and make
-        % sure the vertical alignment is calibrated properly
-        Screen('DrawLine', scr, [255, 0, 0], 0, ycen, xcen, ycen, 5);
-        Screen('DrawLine', scr, [0, 0, 255], xcen, ycen, 2*xcen, ycen, 5);
-        Screen('Flip', scr);
-        WaitSecs(2);
-        KbWait;
-        WaitSecs(2);
-    end
 
 
     function tex = make_image(imagefile, colourmod)
@@ -398,8 +378,7 @@ end
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
-        WaitSecs(1);
-        KbWait;
+        KbStrokeWait;
     end
 
 
