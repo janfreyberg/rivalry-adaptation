@@ -101,6 +101,9 @@ for iGroup = 1:2
         percept_first{iGroup, 3, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 3, 1, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
         
+        num_first{iGroup, 3, 1, 1}(iSubject, 1) = sum(first_green == first_dominant);
+        num_first{iGroup, 3, 1, 3}(iSubject, 1) = sum(first_red == first_dominant);
+        
         trials_noDominant{iGroup, 3, 1}(iSubject) = sum(isnan(first_dominant)) / numel(no_exp_trials);
         
         median_percept{iGroup, 3, 1, 1}(iSubject, 1) = median(green_durs);
@@ -151,6 +154,9 @@ for iGroup = 1:2
         percept_first{iGroup, 1, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 1, 1, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
         
+        num_first{iGroup, 1, 1, 1}(iSubject, 1) = sum(first_green == first_dominant);
+        num_first{iGroup, 1, 1, 3}(iSubject, 1) = sum(first_red == first_dominant);
+        
         trials_noDominant{iGroup, 1, 1}(iSubject) = sum(isnan(first_dominant)) / numel(valid_red_trials);
         
         median_percept{iGroup, 1, 1, 1}(iSubject, 1) = median(green_durs);
@@ -199,6 +205,8 @@ for iGroup = 1:2
         
         percept_first{iGroup, 1, 2, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 1, 2, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
+        num_first{iGroup, 1, 2, 1}(iSubject, 1) = sum(first_green == first_dominant);
+        num_first{iGroup, 1, 2, 3}(iSubject, 1) = sum(first_red == first_dominant);
 
         trials_noDominant{iGroup, 1, 2}(iSubject) = sum(isnan(first_dominant)) / numel(valid_green_trials);
         
@@ -251,6 +259,8 @@ for iGroup = 1:2
                 
         percept_first{iGroup, 2, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 2, 1, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
+        num_first{iGroup, 2, 1, 1}(iSubject, 1) = sum(first_green == first_dominant);
+        num_first{iGroup, 2, 1, 3}(iSubject, 1) = sum(first_red == first_dominant);
         
         trials_noDominant{iGroup, 2, 1}(iSubject) = sum(isnan(first_dominant)) / numel(oppo_red_trials);
         
@@ -300,6 +310,8 @@ for iGroup = 1:2
                 
         percept_first{iGroup, 2, 2, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 2, 2, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
+        num_first{iGroup, 2, 2, 1}(iSubject, 1) = sum(first_green == first_dominant);
+        num_first{iGroup, 2, 2, 3}(iSubject, 1) = sum(first_red == first_dominant);
         
         trials_noDominant{iGroup, 2, 2}(iSubject) = sum(isnan(first_dominant)) / numel(oppo_green_trials);
         
