@@ -331,6 +331,8 @@ for iGroup = 1:2
         percept_sum{iGroup, 2, 2, 3}(iSubject) = sum(total_red) / (numel(oppo_green_trials)*6);
         
         %==================================================================
+        overall_num_firts{iGroup, 1}(iSubject, 1) = sum([num_first{iGroup, 3, 1, 1}(iSubject, 1), num_first{iGroup, 1, 1, 1}(iSubject, 1), num_first{iGroup, 1, 2, 1}(iSubject, 1), num_first{iGroup, 2, 1, 1}(iSubject, 1), num_first{iGroup, 2, 2, 1}(iSubject, 1)]);
+        overall_num_firts{iGroup, 3}(iSubject, 1) = sum([num_first{iGroup, 3, 1, 3}(iSubject, 1), num_first{iGroup, 1, 1, 3}(iSubject, 1), num_first{iGroup, 1, 2, 3}(iSubject, 1), num_first{iGroup, 2, 1, 3}(iSubject, 1), num_first{iGroup, 2, 2, 3}(iSubject, 1)]);
         
         val_toExposed{iGroup}(iSubject, 1) = nanmean(valtime_toExposed);
         val_toNExposed{iGroup}(iSubject, 1) = nanmean(valtime_toNExposed);
