@@ -6,14 +6,13 @@ commandwindow;
 ID = input('Participant ID? ', 's');
 scr_diagonal = 24;%input('Screen Diagonal? ');
 scr_distance = 60;
-diagnosis = input('Diagnosis? ');
+% diagnosis = input('Diagnosis? ');
 
 tstamp = clock;
-if ~isdir( fullfile(pwd, 'Results', mfilename, num2str(diagnosis)) )
-    mkdir( fullfile(pwd, 'Results', mfilename, num2str(diagnosis)) );
+if ~isdir( fullfile(pwd, 'Results', 'rivalry trials repetition') )
+    mkdir( fullfile(pwd, 'Results', 'rivalry trials repetition') );
 end
-savefile = fullfile(pwd, 'Results', mfilename, num2str(diagnosis), [sprintf('%02d-%02d-%02d-%02d%02d-', tstamp(1), tstamp(2), tstamp(3), tstamp(4), tstamp(5)), ID, '.mat']);
-
+savefile = fullfile(pwd, 'Results', 'rivalry trials repetition', [sprintf('%02d-%02d-%02d-%02d%02d-', tstamp(1), tstamp(2), tstamp(3), tstamp(4), tstamp(5)), ID, '.mat']);
 
 
 %% Experiment Variables
@@ -232,10 +231,6 @@ catch err
     savefile = [savefile(1:(size(savefile, 2)-4)), '-ERROR.mat'];
     save(savefile);
     ListenChar(0);
-    if strcmp(input('Do you want to keep the data? y / n >> ', 's'), 'n')
-        delete(savefile);
-        disp('Data not saved.');
-    end
     Priority(0);
     rethrow(err);
 
@@ -536,29 +531,26 @@ end
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
-        WaitSecs(1); KbWait;
+        KbStrokeWait;
         
         Screen('DrawTexture', scr, textures(2), [], stimRect(1:4, 1));
         Screen('DrawTexture', scr, textures(2), [], stimRect(1:4, 2));
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
-        
-        WaitSecs(1); KbWait;
+        KbStrokeWait;
         
         Screen('DrawTexture', scr, textures(1), [], stimRect(1:4, 1));
         Screen('DrawTexture', scr, textures(2), [], stimRect(1:4, 2));
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
-        
-        WaitSecs(1); KbWait;
+        KbStrokeWait;
         
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
-        
-        WaitSecs(1); KbWait;
+        KbStrokeWait;
         
     end
 
