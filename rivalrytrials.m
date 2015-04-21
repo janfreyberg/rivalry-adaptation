@@ -4,8 +4,8 @@ clear all
 %% Session Variables
 commandwindow;
 ID = input('Participant ID? ', 's');
-scr_diagonal = 24;%input('Screen Diagonal? ');
-scr_distance = 60;
+scr_diagonal = 24; % in inches
+scr_distance = 60; % in cm
 % diagnosis = input('Diagnosis? ');
 
 tstamp = clock;
@@ -26,12 +26,12 @@ ycen = scr_dimensions(4)/2;
 stimsizedeg = 3.5;
 stimsize = visual_angle2pixel(stimsizedeg, scr_diagonal, scr_distance, scr_no);
 
-trialdur = 4;
-samplerate = 0.005; % time in between sample collection
+trialdur = 6;
+samplerate = 0.005; % time in between sample collection, in seconds
 
-iti = 1;
+iti = 1; % MINIMUM time in between trials
 
-reps = 9; % repitions per condition
+reps = 9; % repitions per condition - this means per counterbalanced rep of Left/Right swap & Green/Red Exposure
 
 
 
@@ -53,15 +53,15 @@ PsychPortAudio('FillBuffer', pa, bp400);
 % Screen
 scr = Screen('OpenWindow', scr_no, scr_background);
 HideCursor;
-if IsLinux
+if IsLinux % Correct font for Linux for some reason...
     Screen('TextFont', scr, '-schumacher-clean-medium-r-normal--0-0-75-75-c-0-koi8-r');
 end
 Screen('BlendFunction', scr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-% Save scripts for posterity
+% Save script with data for posterity
 scripts = savescripts;
 
-% Priority
+% Priority - ensure this runs with best timing
 Priority(1);
 
 
@@ -79,8 +79,13 @@ fixColour = 255;
 
 
 
-%% Find the spot
-
+%% Find merge spot
+% In this routine, increase proximity (by pressing UP) of two boxes until the participant
+% reports that the "edges meet", i.e. the boxes are immediately adjacent.
+% Then press ENTER to make the boxes jump, match color - this will make
+% them merge for participant. Colored letters are inside the merged box for
+% confirmation (ask if they can see letters fine). Then press ENTER to
+% accept the calibration and move on.
 [offset, frameRect, stimRect, fixLines] = find_offset;
 Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
 Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
@@ -94,7 +99,8 @@ KbStrokeWait;
 textures(1) = make_image(fullfile(pwd, 'Photos', '1.jpg'), [255 0 0]);
 textures(2) = make_image(fullfile(pwd, 'Photos', '2.jpg'), [0 255 0]);
 
-
+% This subfunction presents: Image 1 to both eyes, then Image 2 to both
+% eyes, then Image 1&2 to both eyes. Talk Participant through this.
 demonstrate_stimuli(textures);
 
 Screen('Close', textures);
@@ -217,22 +223,23 @@ data.pressAv = permute(data.pressAv, [2, 3, 1]);
 
 
 
-
-    sca;
-    save(savefile);
-    ListenChar(0);
-    Priority(0);
+% Close all windows, save data, return to normal matlab
+sca;
+save(savefile);
+ListenChar(0);
+Priority(0);
 
 
 
 catch err
 %% Catch
-    sca;
-    savefile = [savefile(1:(size(savefile, 2)-4)), '-ERROR.mat'];
-    save(savefile);
-    ListenChar(0);
-    Priority(0);
-    rethrow(err);
+% Close everything, save data with Error marker, return to normal matlab
+sca;
+savefile = [savefile(1:(size(savefile, 2)-4)), '-ERROR.mat'];
+save(savefile);
+ListenChar(0);
+Priority(0);
+rethrow(err);
 
 
 
@@ -388,24 +395,24 @@ end
         trialOn = GetSecs + 1.5;
         started = 0;
         
-        % pre-exposure
+        % Exposure
         if nargin > 2 && preExpose
             
             if ~catchTrial
-                % texture for adaptation
+                % Texture for adaptation
                 Screen('DrawTexture', scr, textures(preExpose), [], stimRect(1:4, preExpose));
                 Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
                 Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
                 preOn = Screen('Flip', scr);
             elseif catchTrial
-                % present the tex for adaptation to the OPPOSITE eye
+                % Present the tex for adaptation to the OPPOSITE eye
                 Screen('DrawTexture', scr, textures(preExpose), [], stimRect(1:4, mod(preExpose, 2) + 1));
                 Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
                 Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
                 preOn = Screen('Flip', scr);
             end
             
-            % empty frame
+            % empty frame (ISI)
             Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
             Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
             preOff = Screen('Flip', scr, preOn+preDuration-1/120);
@@ -421,7 +428,7 @@ end
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         t0 = Screen('Flip', scr, trialOn-1/120);
         last_wake = t0;
-        tEnd = t0 + 1.5 * duration;
+        tEnd = t0 + duration;
         
         while GetSecs < tEnd
             k = k + 1;
@@ -433,8 +440,10 @@ end
             pressList(k, 1:3) = singlePress(1, [l_key, u_key, r_key]);
             
             if singlePress(esc_key)
+                % Break out of script
                 error('You interrupted the script!');
             elseif singlePress(ent_key)
+                % Break out of loop
                 pressList = zeros(duration/samplerate, 1)-1;
                 pressSecs = zeros(duration/samplerate, 1)-1;
                 return
@@ -448,7 +457,7 @@ end
             
         end
         
-        % return to just frame only
+        % Return to just frame only
         Screen('FrameRect', scr, frameColour, frameRect, frameWidth);
         Screen('DrawLines', scr, fixLines, fixWidth, fixColour);
         Screen('Flip', scr);
