@@ -28,7 +28,7 @@ end
 list(2).length = size(list(2).name, 1);
 
 %% Variables for analysis
-min_percept_dur = 0.15;
+min_percept_dur = 0.05;
 trial_dur = 6;
 
 %% Loop through groups & through subjects
