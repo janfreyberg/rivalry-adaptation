@@ -46,3 +46,5 @@ Temporary Items
 *.mat
 # Ignore autosaves
 *.asv
+# Ignore image files
+*.jpg
