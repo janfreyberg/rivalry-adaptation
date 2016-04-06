@@ -1,13 +1,18 @@
 library(ggplot2)
 library(reshape2)
 
-allData <- read.csv("adaptation_results.csv")
+allData <- read.csv("adaptation-results-original-replication.csv")
 
 # convert diagnosis to factor
-allData$Diagnosis <- as.factor(allData$ASC)
+allData$Diagnosis <- as.factor(allData$Diagnosis)
 levels(allData$Diagnosis) <- c("CON", "ASC")
 
-# kick out outliers
+# convert experiment to factor
+allData$Experiment <- as.factor(allData$Experiment)
+levels(allData$Experiment) <- c("Experiment 1", "Experiment 2")
+
+
+# kick out outliers and only focus on study 1
 inData = subset(allData, Inliers==1)
 
 
@@ -40,7 +45,8 @@ ggplot(inData, aes(x=Diagnosis, y = no.exposure.green.first)) +
 # shift in first percept plot #
 shiftData <- melt(inData[, c("Diagnosis",
                              "val.exposure.exposed.first",
-                             "inv.exposure.exposed.first")])
+                             "inv.exposure.exposed.first",
+                             "Experiment")])
 
 ggplot(shiftData, aes(x=variable, y = value, fill = Diagnosis)) + 
   geom_violin(aes(scale="count")) +
@@ -60,9 +66,9 @@ ggplot(shiftData, aes(x=variable, y = value, fill = Diagnosis)) +
         axis.title.y = element_text(size=14),
         legend.position = "top") +
   # adjust the axes
-  scale_y_continuous(name="Proportion of first percepts that were the\nadapted image (relative to baseline)", 
-                     limits=c(-0.6, 0.6)) +
+  scale_y_continuous(name="Proportion of first percepts that were the\nadapted image (relative to baseline)") +
   scale_x_discrete(name="Condition", labels=c("Same-Eye Adaptation", "Opposite-Eye Adaptation"))
+#  coord_cartesian(ylim=c(-0.5, 0.3))
 
 
 # change in percept duration plot #
