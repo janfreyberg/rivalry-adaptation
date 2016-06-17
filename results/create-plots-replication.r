@@ -1,19 +1,19 @@
 library(ggplot2)
 library(reshape2)
 
-allData <- read.csv("adaptation-results-original-replication.csv")
-
-# convert diagnosis to factor
-allData$Diagnosis <- as.factor(allData$Diagnosis)
-levels(allData$Diagnosis) <- c("CON", "ASC")
-
-# convert experiment to factor
-allData$Experiment <- as.factor(allData$Experiment)
-levels(allData$Experiment) <- c("Experiment 1", "Experiment 2")
-
-
-# kick out outliers and only focus on study 1
-inData = subset(allData, Inliers==1)
+# allData <- read.csv("adaptation-results-original-replication.csv")
+# 
+# # convert diagnosis to factor
+# allData$Diagnosis <- as.factor(allData$Diagnosis)
+# levels(allData$Diagnosis) <- c("CON", "ASC")
+# 
+# # convert experiment to factor
+# allData$Experiment <- as.factor(allData$Experiment)
+# levels(allData$Experiment) <- c("Experiment 1", "Experiment 2")
+# 
+# 
+# # kick out outliers and only focus on study 1
+# inData = subset(allData, Inliers==1)
 
 
 # first percept bias plot

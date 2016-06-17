@@ -1,16 +1,19 @@
+
 library(ggplot2)
-library(reshape2)
-# source("C:\\Users\\k1513504\\Documents\\R\\other-sources\\sigbra.R")
 
-allData <- read.csv("adaptation-results-original-replication.csv")
-
-# convert diagnosis to factor
-allData$Diagnosis <- as.factor(allData$Diagnosis)
-levels(allData$Diagnosis) <- c("CON", "ASC")
-
-# kick out outliers and only focus on study 1
-inData = subset(allData, newInliers==1)
-
+# allData <- read.csv("adaptation-results-original-replication.csv")
+# 
+# # convert diagnosis to factor
+# allData$Diagnosis <- as.factor(allData$Diagnosis)
+# levels(allData$Diagnosis) <- c("CON", "ASC")
+# 
+# # convert experiment to factor
+# allData$Experiment <- as.factor(allData$Experiment)
+# levels(allData$Experiment) <- c("Experiment 1", "Experiment 2")
+# 
+# 
+# # kick out outliers and only focus on study 1
+# inData = subset(allData, Inliers==1)
 
 # first percept bias plot
 ggplot(inData, aes(x=Diagnosis, y = no.exposure.green.first)) +
@@ -30,12 +33,13 @@ ggplot(inData, aes(x=Diagnosis, y = no.exposure.green.first)) +
   scale_y_continuous(name="Proportion of first percepts that\nwere green at baseline") +
   scale_x_discrete(name="Diagnosis", labels=c("Control", "Autism"),
                    expand=c(0, 1.2)) +
-  coord_cartesian() +
+  coord_cartesian(ylim=c(0, 1)) +
   # adjust the theme
   theme(axis.text.x = element_text(size=14),
         axis.title.x = element_text(size=14),
         axis.title.y = element_text(size=14),
         legend.position = "none")
+ggsave("../../paper/figures/first-percept-baseline.pdf", width=4.13, height=5.82)
 
 
 # shift in first percept plot #
@@ -62,32 +66,31 @@ ggplot(shiftData, aes(x=variable, y = value, fill = Diagnosis)) +
         legend.position = "top") +
   # adjust the axes
   scale_y_continuous(name="Proportion of first percepts that were the\nadapted image (relative to baseline)") +
-  scale_x_discrete(name="Condition", labels=c("Same-Eye Adaptation", "Opposite-Eye Adaptation")) +
-  coord_cartesian()
+  scale_x_discrete(name="Condition", labels=c("Same-Eye Adaptation", "Opposite-Eye Adaptation"))
+#  coord_cartesian(ylim=c(-0.5, 0.3))
+ggsave("../../paper/figures/first-percept-shift.pdf", width=8.26, height=5.82)
 
 
 # change in percept duration plot #
 durations <- inData[, c("Diagnosis",
                         "no.exposure.dom.median",
-                        "val.exposed.median.diffscore",
-                        "val.nonexp.median.diffscore",
-                        "inv.exposed.median.diffscore",
-                        "inv.nonexp.median.diffscore")]
+                        "val.exposure.exposed.median",
+                        "val.exposure.nonexp.median",
+                        "inv.exposure.exposed.median",
+                        "inv.exposure.nonexp.median")]
 
-# durations[,2:6] <- durations[,2:6] - durations$no.exposure.dom.median
+durations[,2:6] <- durations[,2:6] - durations$no.exposure.dom.median
 
 durations <- melt(durations[,c(1, 3:6)])
 
-durations$exposure.condition <- as.factor(durations$variable == "val.exposed.median.diffscore" |
-  durations$variable == "val.nonexp.median.diffscore")
+durations$exposure.condition <- as.factor(durations$variable == "val.exposure.exposed.median" |
+  durations$variable == "val.exposure.nonexp.median")
 levels(durations$exposure.condition) <- c("Opposite-Eye Adaptation",
                                           "Same-Eye Adaptation")
+durations$exposure.condition <- factor(durations$exposure.condition, levels=rev(levels(durations$exposure.condition)))
 
-durations$exposure.condition <- factor(durations$exposure.condition,
-                                       levels=rev(levels(durations$exposure.condition)))
-
-durations$exposure.type <- as.factor(durations$variable == "val.exposed.median.diffscore" |
-                                       durations$variable == "inv.exposed.median.diffscore")
+durations$exposure.type <- as.factor(durations$variable == "val.exposure.exposed.median" |
+                                       durations$variable == "inv.exposure.exposed.median")
 levels(durations$exposure.type) <- c("Non-adapted\nImage",
                                           "Adapted\nImage")
 
@@ -115,6 +118,8 @@ ggplot(durations, aes(x=exposure.type, y = value, fill = Diagnosis)) +
         axis.title.y = element_text(size=14),
         legend.position = "top") +
   # adjust the axes
-  coord_cartesian() +
+  # coord_cartesian(ylim=c(-0.75, 1.05)) +
   scale_y_continuous(name="Change in median dominance duration of stimuli\n(relative to baseline)") +
   scale_x_discrete(name="Stimulus")
+
+ggsave("../../paper/figures/dominance-duration-shift.pdf", width=8.26, height=5.82)

@@ -1,7 +1,8 @@
-clear all
+clearvars;
 %#ok<*SAGROW>
 %#ok<*AGROW>
- 
+
+
 %% Determine list of files
 list(1).name = ls(fullfile( pwd, '0', '*.mat' ));
 list(1).length = size(list(1).name, 1);
@@ -27,15 +28,20 @@ for i = 1:list(2).length
 end
 list(2).length = size(list(2).name, 1);
 
+
 %% Variables for analysis
 min_percept_dur = 0.15;
 trial_dur = 6;
+
+table_id = {}; table_varname = {}; table_varvalue = []; table_diagnosis = {};
+diagnosisOptions = {'Control', 'Autism'};
+
 
 %% Loop through groups & through subjects
 
 for iGroup = 1:2
     for iSubject = 1:list(iGroup).length
-        % Load this persons data
+        % Load this persons data, display progress
         disp(['Processing Group ', num2str(iGroup), ' Subject ', num2str(iSubject)]);
         subjectfile = fullfile(pwd, num2str(iGroup-1), list(iGroup).name(iSubject, :));
         load(subjectfile, 'data');
@@ -67,6 +73,7 @@ for iGroup = 1:2
         % No Exposure Trials
         clear first_green first_dominant first_red first_mix total_green total_mix total_red
         green_durs = []; red_durs = []; mix_durs = [];
+        first_green_durs = []; first_red_durs = [];
         for iTrial = no_exp_trials
             trial_no = find(iTrial==no_exp_trials);
             
@@ -94,8 +101,16 @@ for iGroup = 1:2
             [total_green(trial_no), total_red(trial_no), total_mix(trial_no)] = identify_totals(percept_durs, green_index, red_index, mix_index);
                 
             green_durs = [green_durs; percept_durs(green_index)]; red_durs = [red_durs; percept_durs(red_index)]; mix_durs = [mix_durs; percept_durs(mix_index)];
+            
+            if any(green_index) && green_index(find(green_index | red_index, 1))
+                first_green_durs = [first_green_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            elseif any(red_index) && red_index(find(green_index | red_index, 1))
+                first_red_durs = [first_red_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            end
         end
-                
+        
         percept_first{iGroup, 3, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
         percept_first{iGroup, 3, 1, 3}(iSubject) = sum(first_red == first_dominant) / sum(~isnan(first_dominant));
         
@@ -112,10 +127,14 @@ for iGroup = 1:2
         percept_sum{iGroup, 3, 1, 2}(iSubject) = sum(total_mix) / (numel(no_exp_trials)*6);
         percept_sum{iGroup, 3, 1, 3}(iSubject) = sum(total_red) / (numel(no_exp_trials)*6);
         
+        first_percept_dur{iGroup, 3, 1, 1, iSubject} = first_green_durs;
+        first_percept_dur{iGroup, 3, 1, 3, iSubject} = first_red_durs;
+        
         % Valid Exposed Trials
         % Red Exposed
         clear first_green first_dominant first_red first_mix total_green total_mix total_red
         green_durs = []; red_durs = []; mix_durs = [];
+        first_green_durs = []; first_red_durs = [];
         for iTrial = valid_red_trials
             trial_no = find(iTrial==valid_red_trials);
             
@@ -142,6 +161,14 @@ for iGroup = 1:2
             [total_green(trial_no), total_red(trial_no), total_mix(trial_no)] = identify_totals(percept_durs, green_index, red_index, mix_index);
             
             green_durs = [green_durs; percept_durs(green_index)]; red_durs = [red_durs; percept_durs(red_index)]; mix_durs = [mix_durs; percept_durs(mix_index)];
+            
+            if any(green_index) && green_index(find(green_index | red_index, 1))
+                first_green_durs = [first_green_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            elseif any(red_index) && red_index(find(green_index | red_index, 1))
+                first_red_durs = [first_red_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            end
         end
                 
         percept_first{iGroup, 1, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
@@ -160,11 +187,15 @@ for iGroup = 1:2
         percept_sum{iGroup, 1, 1, 2}(iSubject) = sum(total_mix) / (numel(valid_red_trials)*6);
         percept_sum{iGroup, 1, 1, 3}(iSubject) = sum(total_red) / (numel(valid_red_trials)*6);
         
+        first_percept_dur{iGroup, 1, 1, 1, iSubject} = first_green_durs;
+        first_percept_dur{iGroup, 1, 1, 3, iSubject} = first_red_durs;
+        
         % Valid Exposed Trials
         % Green Exposed
         clear first_green first_dominant first_red first_mix total_green total_mix total_red
         prevExposed = red_durs; prevNonExposed = green_durs; prevMixed = mix_durs;
         green_durs = []; red_durs = []; mix_durs = [];
+        first_green_durs = []; first_red_durs = [];
         for iTrial = valid_green_trials
             trial_no = find(iTrial==valid_green_trials);
             
@@ -191,6 +222,14 @@ for iGroup = 1:2
             [total_green(trial_no), total_red(trial_no), total_mix(trial_no)] = identify_totals(percept_durs, green_index, red_index, mix_index);
                 
             green_durs = [green_durs; percept_durs(green_index)]; red_durs = [red_durs; percept_durs(red_index)]; mix_durs = [mix_durs; percept_durs(mix_index)];
+            
+            if any(green_index) && green_index(find(green_index | red_index, 1))
+                first_green_durs = [first_green_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            elseif any(red_index) && red_index(find(green_index | red_index, 1))
+                first_red_durs = [first_red_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            end
         end
         
         percept_first{iGroup, 1, 2, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
@@ -213,10 +252,15 @@ for iGroup = 1:2
         percept_sum{iGroup, 1, 2, 2}(iSubject) = sum(total_mix) / (numel(valid_green_trials)*6);
         percept_sum{iGroup, 1, 2, 3}(iSubject) = sum(total_red) / (numel(valid_green_trials)*6);
         
+        first_percept_dur{iGroup, 1, 2, 1, iSubject} = first_green_durs;
+        first_percept_dur{iGroup, 1, 2, 3, iSubject} = first_red_durs;
+
+        
         % Opposite Exposed Trials
         % Red Exposed
         clear first_green first_dominant first_red first_mix total_green total_mix total_red
         green_durs = []; red_durs = []; mix_durs = [];
+        first_green_durs = []; first_red_durs = [];
         for iTrial = oppo_red_trials
             trial_no = find(iTrial==oppo_red_trials);
             
@@ -243,6 +287,14 @@ for iGroup = 1:2
             [total_green(trial_no), total_red(trial_no), total_mix(trial_no)] = identify_totals(percept_durs, green_index, red_index, mix_index);
                 
             green_durs = [green_durs; percept_durs(green_index)]; red_durs = [red_durs; percept_durs(red_index)]; mix_durs = [mix_durs; percept_durs(mix_index)];
+            
+            if any(green_index) && green_index(find(green_index | red_index, 1))
+                first_green_durs = [first_green_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            elseif any(red_index) && red_index(find(green_index | red_index, 1))
+                first_red_durs = [first_red_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            end
         end
                 
         percept_first{iGroup, 2, 1, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
@@ -261,11 +313,16 @@ for iGroup = 1:2
         percept_sum{iGroup, 2, 1, 2}(iSubject) = sum(total_mix) / (numel(oppo_red_trials)*6);
         percept_sum{iGroup, 2, 1, 3}(iSubject) = sum(total_red) / (numel(oppo_red_trials)*6);
         
+        first_percept_dur{iGroup, 2, 2, 1, iSubject} = first_green_durs;
+        first_percept_dur{iGroup, 2, 2, 3, iSubject} = first_red_durs;
+
+        
         % Opposite Exposed Trials
         % Green Exposed
         clear first_green first_dominant first_red first_mix total_green total_mix total_red
         prevExposed = red_durs; prevNonExposed = green_durs; prevMixed = mix_durs;
         green_durs = []; red_durs = []; mix_durs = [];
+        first_green_durs = []; first_red_durs = [];
         for iTrial = oppo_green_trials
             trial_no = find(iTrial==oppo_green_trials);
             
@@ -292,6 +349,14 @@ for iGroup = 1:2
             [total_green(trial_no), total_red(trial_no), total_mix(trial_no)] = identify_totals(percept_durs, green_index, red_index, mix_index);
                 
             green_durs = [green_durs; percept_durs(green_index)]; red_durs = [red_durs; percept_durs(red_index)]; mix_durs = [mix_durs; percept_durs(mix_index)];
+            
+            if any(green_index) && green_index(find(green_index | red_index, 1))
+                first_green_durs = [first_green_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            elseif any(red_index) && red_index(find(green_index | red_index, 1))
+                first_red_durs = [first_red_durs;
+                                    percept_durs(find(green_index | red_index, 1))];
+            end
         end
                 
         percept_first{iGroup, 2, 2, 1}(iSubject) = sum(first_green == first_dominant) / sum(~isnan(first_dominant));
@@ -314,6 +379,9 @@ for iGroup = 1:2
         percept_sum{iGroup, 2, 2, 2}(iSubject) = sum(total_mix) / (numel(oppo_green_trials)*6);
         percept_sum{iGroup, 2, 2, 3}(iSubject) = sum(total_red) / (numel(oppo_green_trials)*6);
         
+        first_percept_dur{iGroup, 2, 2, 1, iSubject} = first_green_durs;
+        first_percept_dur{iGroup, 2, 2, 3, iSubject} = first_red_durs;
+        
         %==================================================================
         
         val_toExposed{iGroup}(iSubject, 1) = nanmedian(valtime_toExposed);
@@ -322,5 +390,72 @@ for iGroup = 1:2
         inv_toNExposed{iGroup}(iSubject, 1) = nanmedian(invtime_toNExposed);
         non_toDominant{iGroup}(iSubject, 1) = nanmedian(notime_toDominant);
         
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Create a "tall" table of data
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % first greens, no exposure
+        n = numel(first_percept_dur{iGroup, 3, 1, 1, iSubject});
+        varvalue = first_percept_dur{iGroup, 3, 1, 1, iSubject};
+        table_varname = [table_varname;
+                        repmat({'noexp.first.green.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
+        
+        % first reds, no exposure
+        varvalue = first_percept_dur{iGroup, 3, 1, 3, iSubject};
+        n = numel(varvalue);
+        table_varname = [table_varname;
+                        repmat({'noexp.first.red.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
+        
+        % first adapted, val exposure
+        varvalue = [first_percept_dur{iGroup, 1, 1, 3, iSubject};
+                    first_percept_dur{iGroup, 1, 2, 1, iSubject}];
+        n = numel(varvalue);
+        table_varname = [table_varname;
+                        repmat({'val.first.adapted.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
+        
+        % first nonadapted, val exposure
+        varvalue = [first_percept_dur{iGroup, 1, 1, 1, iSubject};
+                    first_percept_dur{iGroup, 1, 2, 3, iSubject}];
+        n = numel(varvalue);
+        table_varname = [table_varname;
+                        repmat({'val.first.nonadap.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
+        
+        % first adapted, inv exposure
+        varvalue = [first_percept_dur{iGroup, 2, 1, 3, iSubject};
+                    first_percept_dur{iGroup, 2, 2, 1, iSubject}];
+        n = numel(varvalue);
+        table_varname = [table_varname;
+                        repmat({'inv.first.adapted.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
+        
+        % first nonadapted, inv exposure
+        varvalue = [first_percept_dur{iGroup, 2, 1, 1, iSubject};
+                    first_percept_dur{iGroup, 2, 2, 3, iSubject}];
+        n = numel(varvalue);
+        table_varname = [table_varname;
+                        repmat({'inv.first.nonadap.dur'}, n, 1)];
+        table_id = [table_id;
+                    repmat({list(iGroup).name(iSubject, 17:end-4)}, n, 1)];
+        table_varvalue = [table_varvalue; varvalue];
     end
+    table_diagnosis = [table_diagnosis; repmat(diagnosisOptions(iGroup),...
+                        numel(table_varvalue)-numel(table_diagnosis), 1)];
 end
+first_percept_data = table(table_id, table_diagnosis, table_varname, table_varvalue);
+writetable(first_percept_data, '../../results/first-percept-durs-tall.csv');
